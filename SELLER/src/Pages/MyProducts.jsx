@@ -16,6 +16,7 @@ import {
   Box
 } from "lucide-react";
 import { StoreContext } from "../Context";
+import EditProductModal from "../Components/EditProductModal"; // Import the new modal component
 
 const MyProducts = () => {
   const [products, setProducts] = useState([]);
@@ -24,6 +25,10 @@ const MyProducts = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [viewMode, setViewMode] = useState("grid"); // grid or table
   const { url, token } = useContext(StoreContext);
+  
+  // New state for the edit modal
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -69,11 +74,20 @@ const MyProducts = () => {
     }
   };
 
+  // Updated to open modal with product data
   const handleEditProduct = (id) => {
-    // Navigate to edit product page or open modal
-    // This would typically be implemented with React Router
-    toast.info(`Editing product ${id}`);
-    // Example with React Router: navigate(`/products/edit/${id}`);
+    const productToEdit = products.find(product => product._id === id);
+    if (productToEdit) {
+      setSelectedProduct(productToEdit);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  // Handle product update from the modal
+  const handleProductUpdated = (updatedProduct) => {
+    setProducts(products.map(p => 
+      p._id === updatedProduct._id ? updatedProduct : p
+    ));
   };
 
   const renderGridView = () => {
@@ -315,6 +329,19 @@ const MyProducts = () => {
           </div>
         </>
       )}
+
+      {/* Edit Product Modal */}
+      <EditProductModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedProduct(null);
+        }}
+        product={selectedProduct}
+        onProductUpdated={handleProductUpdated}
+        url={url}
+        token={token}
+      />
     </div>
   );
 };

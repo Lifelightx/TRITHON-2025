@@ -121,17 +121,7 @@ const Navbar = () => {
               </Link>
             </motion.div>
             
-            <motion.div whileHover="hover" whileTap="tap" variants={navItemVariants}>
-              <Link to="/seller/earnings" className="flex items-center text-[#260e02] hover:text-[#dc7600] transition">
-                <DollarSign className="mr-1" /> Earnings
-              </Link>
-            </motion.div>
             
-            <motion.div whileHover="hover" whileTap="tap" variants={navItemVariants}>
-              <Link to="/seller/stock" className="flex items-center text-[#260e02] hover:text-[#dc7600] transition">
-                <Layers className="mr-1" /> Stock
-              </Link>
-            </motion.div>
             
             <motion.div whileHover="hover" whileTap="tap" variants={navItemVariants}>
               <Link to="/seller/profile" className="flex items-center text-[#260e02] hover:text-[#dc7600] transition">
