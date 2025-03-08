@@ -1,4 +1,4 @@
-import express from "express"
+import express from "express";
 import {
   getUsers,
   getUserById,
@@ -11,29 +11,44 @@ import {
   updateCategory,
   deleteCategory,
   featureProduct,
-} from "../controllers/admin.controller.js"
-import { protect, admin } from "../middleware/auth.js"
+  approveProduct, 
+  loginAdmin, 
+  getAdminProfile, // Import for product approval
+} from "../controllers/admin.controller.js";
+import { protectAdmin } from "../middleware/admin.auth.js"; // Middleware for route protection
 
-const router = express.Router()
+const router = express.Router();
 
-router.route("/users").get(protect, admin, getUsers)
+// Admin Authentication Routes
+router.post("/login", loginAdmin); // Public route for admin login
+router.get("/profile", protectAdmin, getAdminProfile); // Protected route for admin profile
+
+// Users-related routes
+router.route("/users").get(protectAdmin, getUsers);
 
 router
   .route("/users/:id")
-  .get(protect, admin, getUserById)
-  .put(protect, admin, updateUser)
-  .delete(protect, admin, deleteUser)
+  .get(protectAdmin, getUserById)
+  .put(protectAdmin, updateUser)
+  .delete(protectAdmin, deleteUser);
 
-router.get("/sellers/pending", protect, admin, getPendingSellerApprovals)
-router.put("/sellers/:id/approve", protect, admin, approveSeller)
+// Sellers-related routes
+router.get("/sellers/pending", protectAdmin, getPendingSellerApprovals);
+router.post("/sellers/:id/approve", protectAdmin, approveSeller); // POST for approveSeller
 
-router.get("/dashboard", protect, admin, getDashboardStats)
+// Dashboard-related routes
+router.get("/dashboard", protectAdmin, getDashboardStats);
 
-router.route("/categories").post(protect, admin, createCategory)
+// Categories-related routes
+router.route("/categories").post(protectAdmin, createCategory);
 
-router.route("/categories/:id").put(protect, admin, updateCategory).delete(protect, admin, deleteCategory)
+router
+  .route("/categories/:id")
+  .put(protectAdmin, updateCategory)
+  .delete(protectAdmin, deleteCategory);
 
-router.route("/products/:id/feature").put(protect, admin, featureProduct)
+// Products-related routes
+router.route("/products/:id/feature").put(protectAdmin, featureProduct);
+router.route("/products/:id/approve").post(protectAdmin, approveProduct); // Product approval route
 
-export default router
-
+export default router;
