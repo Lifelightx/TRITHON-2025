@@ -71,7 +71,7 @@ const SellerRegistration = () => {
                 whileTap={{ scale: 0.95 }}
                 type="submit"
                 className="w-full bg-orange-600 cursor-pointer text-white py-3 rounded-lg font-bold hover:bg-orange-700 transition-colors"
-                
+                onClick={() => {navigate("/seller/login")}}
               >
                 Register Now
               </motion.button>
