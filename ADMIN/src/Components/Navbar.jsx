@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import { Menu, X, Users, Store, ShoppingBag, FileText, BarChart2, Tag, MessageSquare } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
-
+  
   const navItems = [
-    { name: 'Manage Users', icon: <Users className="w-5 h-5" /> },
-    { name: 'Manage Sellers', icon: <Store className="w-5 h-5" /> },
-    { name: 'Product Moderation', icon: <ShoppingBag className="w-5 h-5" /> },
-    { name: 'Manage Categories', icon: <Tag className="w-5 h-5" /> },
-    { name: 'Review Complaints', icon: <MessageSquare className="w-5 h-5" /> },
-    { name: 'Analytics Dashboard', icon: <BarChart2 className="w-5 h-5" /> },
+    { name: 'Manage Users', icon: <Users className="w-5 h-5" />, path: '/admin/users' },
+    { name: 'Manage Sellers', icon: <Store className="w-5 h-5" />, path: '/admin/sellers' },
+    { name: 'Product Moderation', icon: <ShoppingBag className="w-5 h-5" />, path: '/admin/products' },
+    { name: 'Manage Categories', icon: <Tag className="w-5 h-5" />, path: '/admin/categories' },
+    { name: 'Review Complaints', icon: <MessageSquare className="w-5 h-5" />, path: '/admin/complaints' },
+    { name: 'Analytics Dashboard', icon: <BarChart2 className="w-5 h-5" />, path: '/admin/analytics' },
   ];
-
+  
   return (
     <div className="bg-gray-800 text-white">
       {/* Desktop Navbar */}
@@ -24,20 +25,22 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 font-bold text-xl">
-              Admin Panel
+              <Link to="/admin" className="flex items-center">
+                Admin Panel
+              </Link>
             </div>
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-4">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item.name}
-                  href="#"
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-#-700 flex items-center space-x-1"
+                  to={item.path}
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 flex items-center space-x-1"
                 >
                   {item.icon}
-                  <span>{item.name}</span>
-                </a>
+                  <span className="ml-2">{item.name}</span>
+                </Link>
               ))}
             </div>
           </div>
@@ -51,20 +54,21 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-
+      
       {/* Mobile menu, show/hide based on menu state */}
       {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href="#"
-                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 flex items-center space-x-2"
+                to={item.path}
+                className=" px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 flex items-center space-x-2"
+                onClick={() => setIsOpen(false)}
               >
                 {item.icon}
-                <span>{item.name}</span>
-              </a>
+                <span className="ml-2">{item.name}</span>
+              </Link>
             ))}
           </div>
         </div>
