@@ -17,6 +17,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { StoreContext } from "../Context";
+import { toast } from "react-toastify";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -68,6 +69,7 @@ function Navbar() {
       axios.post(`${url}/api/auth/login`,values)
       .then(res=> {
         setToken(res.data.token)
+ 
         localStorage.setItem("token",res.data.token)
         setUser(res.data)
       })
@@ -102,7 +104,7 @@ function Navbar() {
     onSubmit: (values,{resetForm}) => {
       console.log("Sign Up Data:", values);
       axios.post(`${url}/api/auth/register`, values)
-      .then( res =>  console.log(res))
+      .then( res => toast.success("User Created Successfully"))
       .catch(err => console.log(err))
       resetForm();
       closeModals();
