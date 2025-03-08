@@ -1,58 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Trash2, ShoppingBag, MinusCircle, PlusCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { StoreContext } from '../Context';
 
 const CartPage = () => {
-    const [cart, setCart] = useState({
-        items: [
-          {
-            product: {
-              _id: "p1",
-              name: "Handcrafted Wooden Bowl",
-              price: 25.99,
-              images: ["/images/wooden-bowl.jpg"],
-              craftType: "Woodwork",
-              region: "Odisha",
-              description: "A beautifully handcrafted wooden bowl made by skilled artisans."
-            },
-            quantity: 2
-          },
-          {
-            product: {
-              _id: "p2",
-              name: "Terracotta Vase",
-              price: 18.5,
-              images: ["/images/terracotta-vase.jpg"],
-              craftType: "Pottery",
-              region: "West Bengal",
-              description: "An elegant terracotta vase perfect for home decor."
-            },
-            quantity: 1
-          },
-          {
-            product: {
-              _id: "p3",
-              name: "Handwoven Cotton Scarf",
-              price: 12.75,
-              images: ["/images/cotton-scarf.jpg"],
-              craftType: "Weaving",
-              region: "Rajasthan",
-              description: "A soft, handwoven cotton scarf with intricate designs."
-            },
-            quantity: 3
-          }
-        ]
-      });
-  const navigate = useNavigate()
+  const [cart, setCart] = useState({ items: [] });
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
+  const { url, token } = useContext(StoreContext);
 
   useEffect(() => {
-    fetchCart();
-  }, []);
+    if (token) {
+      fetchCart();
+    }
+  }, [token]);
 
   useEffect(() => {
     // Calculate total price whenever cart items change
@@ -62,61 +27,62 @@ const CartPage = () => {
   const fetchCart = async () => {
     try {
       setLoading(true);
-      // Assuming you have an API endpoint to fetch the current user's cart
-      const response = await axios.get('/api/cart');
-      
-      // If we get a response but no cart or empty cart, we just show empty state
-    //   setCart( { items: [] });
+      const response = await axios.get(`${url}/api/cart`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setCart(response.data);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching cart:', err);
       // Instead of showing error for no data, we show empty cart
-      setCart({ items: [] });
-      // Only set error if it's not a 404 (no cart found)
-      if (err.response && err.response.status !== 404) {
-        setError('Failed to fetch your cart. Please try again.');
+      if (err.response && err.response.status === 404) {
+        setCart({ items: [] });
       }
       setLoading(false);
     }
   };
 
   const calculateTotal = () => {
+    if (!cart.items || cart.items.length === 0) {
+      setTotalPrice(0);
+      return;
+    }
+    
     const total = cart.items.reduce((sum, item) => {
       return sum + (item.product?.price || 0) * item.quantity;
     }, 0);
     setTotalPrice(total);
   };
 
-  const updateItemQuantity = async (itemId, newQuantity) => {
+  const updateItemQuantity = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
     
     try {
-      await axios.put(`/api/cart/items/${itemId}`, { quantity: newQuantity });
-      
-      // Update local state without fetching the entire cart again
-      setCart(prevCart => ({
-        ...prevCart,
-        items: prevCart.items.map(item => 
-          item.product._id === itemId 
-            ? { ...item, quantity: newQuantity } 
-            : item
-        )
-      }));
+      const response = await axios.put(`${url}/api/cart/${productId}`, 
+        { quantity: newQuantity },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      setCart(response.data);
     } catch (err) {
       setError('Failed to update quantity. Please try again.');
       console.error('Error updating quantity:', err);
     }
   };
 
-  const removeItem = async (itemId) => {
+  const removeItem = async (productId) => {
     try {
-      await axios.delete(`/api/cart/items/${itemId}`);
-      
-      // Update local state
-      setCart(prevCart => ({
-        ...prevCart,
-        items: prevCart.items.filter(item => item.product._id !== itemId)
-      }));
+      const response = await axios.delete(`${url}/api/cart/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setCart(response.data);
     } catch (err) {
       setError('Failed to remove item. Please try again.');
       console.error('Error removing item:', err);
@@ -191,11 +157,11 @@ const CartPage = () => {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0, height: 0 }}
                       className="p-4"
-                    >
+                    > 
                       <div className="flex flex-col sm:flex-row">
                         <div className="sm:w-24 h-24 sm:h-auto mb-4 sm:mb-0 flex-shrink-0">
                           <img
-                            src={item.product.images[0] || '/api/placeholder/100/100'}
+                            src={`${url}${item.product.images[0]}`}
                             alt={item.product.name}
                             className="w-full h-full object-cover rounded-md"
                           />
@@ -205,21 +171,24 @@ const CartPage = () => {
                             <div>
                               <h3 className="text-lg font-medium text-stone-800">{item.product.name}</h3>
                               <p className="text-sm text-stone-500 mb-2">
-                                Craft: {item.product.craftType} | Region: {item.product.region}
+                                Seller: {item.product.seller?.name}
                               </p>
-                              <p className="text-amber-600 font-medium">₹{item.product.price.toFixed(2)}</p>
+                              <p className="text-amber-600 font-medium">₹{item.product.price?.toFixed(2)}</p>
                             </div>
                             <div className="flex items-center mt-4 sm:mt-0">
                               <button
                                 onClick={() => updateItemQuantity(item.product._id, item.quantity - 1)}
                                 className="text-stone-400 hover:text-amber-600 transition-colors"
+                                disabled={item.quantity <= 1}
                               >
                                 <MinusCircle size={20} />
                               </button>
                               <span className="mx-3 w-8 text-center">{item.quantity}</span>
+                              
                               <button
                                 onClick={() => updateItemQuantity(item.product._id, item.quantity + 1)}
                                 className="text-stone-400 hover:text-amber-600 transition-colors"
+                                disabled={item.quantity >= item.product.countInStock}
                               >
                                 <PlusCircle size={20} />
                               </button>
@@ -233,6 +202,13 @@ const CartPage = () => {
                           </div>
                           <div className="mt-2">
                             <p className="text-sm text-stone-600 line-clamp-2">{item.product.description}</p>
+                          </div>
+                          <div className="mt-2 text-sm text-stone-500">
+                            {item.product.countInStock <= 5 && (
+                              <p className="text-amber-600">
+                                Only {item.product.countInStock} left in stock!
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -254,11 +230,11 @@ const CartPage = () => {
                   </div>
                   <div className="flex justify-between text-stone-600">
                     <span>Shipping</span>
-                    <span>Calculated at checkout</span>
+                    <span className='text-red-400'>Free</span>
                   </div>
                   <div className="flex justify-between text-stone-600">
                     <span>Tax</span>
-                    <span>Calculated at checkout</span>
+                    <span className='text-red-400'>Free</span>
                   </div>
                 </div>
                 
@@ -274,6 +250,7 @@ const CartPage = () => {
                   whileTap={{ scale: 0.98 }}
                   onClick={handleCheckout}
                   className="w-full bg-amber-600 text-white py-3 rounded-lg font-medium hover:bg-amber-700 transition-colors"
+                  disabled={cart.items.length === 0}
                 >
                   Proceed to Checkout
                 </motion.button>
