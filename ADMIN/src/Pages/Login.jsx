@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, User, Lock, ShoppingBag } from 'lucide-react';
+import {useNavigate} from "react-router-dom";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
+const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
     // Here you would handle the login logic
@@ -85,6 +86,7 @@ const Login = () => {
             <button
               type="submit"
               className="w-full px-4 py-2 text-sm font-medium text-white bg-[#bf4221] border border-transparent rounded-md shadow-sm hover:bg-[#a3361a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={() => navigate("/home")}
             >
               Sign in
             </button>
