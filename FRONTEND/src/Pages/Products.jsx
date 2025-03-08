@@ -10,6 +10,8 @@ const Products = () => {
   const [page, setPage] = useState(1); // Current page state
   const [totalPages, setTotalPages] = useState(1); // Total pages
   const { url } = useContext(StoreContext);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -17,6 +19,7 @@ const Products = () => {
         // API call with pagination
         const response = await axios.get(`${url}/api/products?pageNumber=${page}`);
         setProducts(response.data.products);
+        setFilteredProducts(response.data.products);
         setTotalPages(response.data.pages); // Setting total pages from the API
         setLoading(false);
       } catch (error) {
@@ -36,6 +39,26 @@ const Products = () => {
     if (page < totalPages) setPage(page + 1);
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    
+    // Filter products based on search term
+    const filtered = products.filter(product => 
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.craftType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.region.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    setFilteredProducts(filtered);
+    setPage(1); // Reset to first page when searching
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    setFilteredProducts(products);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -50,9 +73,37 @@ const Products = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Artisan Crafts Collection</h1>
+
+      {/* Search Bar */}
+      <form onSubmit={handleSearch} className="mb-8">
+        <div className="flex gap-2 max-w-lg mx-auto">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by name, description, craft type or region..."
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+          />
+          <button
+            type="submit"
+            className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors duration-200"
+          >
+            Search
+          </button>
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </form>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <Link to={`/details/${product._id}`} className="block">
               <img 
