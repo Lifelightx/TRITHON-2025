@@ -3,22 +3,21 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useContext } from 'react';
 import { StoreContext } from '../Context';
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const {url} = useContext(StoreContext)
-  useEffect(() => {
+  const [page, setPage] = useState(1); // Current page state
+  const [totalPages, setTotalPages] = useState(1); // Total pages
+  const { url } = useContext(StoreContext);
 
-    // This would be replaced with an actual API call when backend is ready
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Mock API delay
-        axios.get(`${url}/api/products`)
-        .then((response) =>{ setProducts(response.data.products)
-          console.log(response.data)
-        })
-        .catch((error) => console.error(error))
-        
+        // API call with pagination
+        const response = await axios.get(`${url}/api/products?pageNumber=${page}`);
+        setProducts(response.data.products);
+        setTotalPages(response.data.pages); // Setting total pages from the API
         setLoading(false);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -27,7 +26,15 @@ const Products = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [page, url]); // Re-fetch products when the page changes
+
+  const handlePrevious = () => {
+    if (page > 1) setPage(page - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage(page + 1);
+  };
 
   if (loading) {
     return (
@@ -49,7 +56,7 @@ const Products = () => {
           <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <Link to={`/details/${product._id}`} className="block">
               <img 
-                src={`${url}${product.images[0]}`} 
+                src={`${url}${product.images[0]}`}
                 alt={product.name} 
                 className="w-full h-48 object-cover"
               />
@@ -82,6 +89,31 @@ const Products = () => {
             </Link>
           </div>
         ))}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center mt-8">
+        <button
+          onClick={handlePrevious}
+          disabled={page === 1}
+          className={`px-4 py-2 rounded-l bg-blue-500 text-white font-semibold hover:bg-blue-600 transition ${
+            page === 1 ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+        >
+          Previous
+        </button>
+        <span className="px-4 py-2 border bg-gray-100 text-gray-800">
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={handleNext}
+          disabled={page === totalPages}
+          className={`px-4 py-2 rounded-r bg-blue-500 text-white font-semibold hover:bg-blue-600 transition ${
+            page === totalPages ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
