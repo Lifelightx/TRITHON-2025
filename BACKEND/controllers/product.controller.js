@@ -5,123 +5,6 @@ import path from 'path';
 import fs from 'fs';
 
 // Helper function to process image files
-const processImages = (files) => {
-  return files.map(file => `/uploads/images/${file.filename}`);
-};
-
-// @desc    Fetch all products
-// @route   GET /api/products
-// @access  Public
-export const getProducts = asyncHandler(async (req, res) => {
-  const pageSize =9;
-  const page = Number(req.query.pageNumber) || 1;
-
-  const keyword = req.query.keyword
-    ? {
-        $or: [
-          { name: { $regex: req.query.keyword, $options: 'i' } },
-          { description: { $regex: req.query.keyword, $options: 'i' } },
-          { tags: { $regex: req.query.keyword, $options: 'i' } },
-        ],
-      }
-    : {};
-
-  const category = req.query.category ? { category: req.query.category } : {};
-  const priceMin = req.query.priceMin ? { price: { $gte: Number(req.query.priceMin) } } : {};
-  const priceMax = req.query.priceMax ? { price: { $lte: Number(req.query.priceMax) } } : {};
-  const rating = req.query.rating ? { rating: { $gte: Number(req.query.rating) } } : {};
-  const craftType = req.query.craftType ? { craftType: req.query.craftType } : {};
-  const region = req.query.region ? { region: req.query.region } : {};
-
-  // Combine all filters
-  const filters = {
-    ...keyword,
-    ...category,
-    ...priceMin,
-    ...priceMax,
-    ...rating,
-    ...craftType,
-    ...region,
-    isActive: true,
-  };
-
-  const count = await Product.countDocuments(filters);
-  const products = await Product.find(filters)
-    .populate('category', 'name')
-    .populate('seller', 'name')
-    .limit(pageSize)
-    .skip(pageSize * (page - 1))
-    .sort(req.query.sortBy ? { [req.query.sortBy]: req.query.order === 'desc' ? -1 : 1 } : { createdAt: -1 });
-
-  res.json({
-    products,
-    page,
-    pages: Math.ceil(count / pageSize),
-    count,
-  });
-});
-
-// @desc    Fetch single product
-// @route   GET /api/products/:id
-// @access  Public
-export const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id).populate('category', 'name').populate('seller', 'name');
-
-  if (product && product.isActive) {
-    res.json(product);
-  } else {
-    res.status(404);
-    throw new Error('Product not found');
-  }
-});
-
-// @desc    Create a product
-// @route   POST /api/products
-// @access  Private/Seller
-export const createProduct = asyncHandler(async (req, res) => {
-  const {
-    name,
-    description,
-    price,
-    category,
-    countInStock,
-    materials,
-    dimensions,
-    weight,
-    tags,
-    craftType,
-    region,
-  } = req.body;
-  
-  // Verify category exists
-  // const categoryExists = await Category.findById(category);
-  // if (!categoryExists) {
-  //   res.status(400);
-  //   throw new Error('Invalid category');
-  // }
-  const dimensionsParsed = JSON.parse(dimensions)
-  const weightParsed = JSON.parse(weight)
-  const images = processImages(req.files);
-  console.log()
-  const product = new Product({
-    seller: req.seller._id,
-    name,
-    description,
-    price,
-    images,
-    category,
-    countInStock,
-    materials: materials || [],
-    dimensions: dimensionsParsed || {},
-    weight: weightParsed || {},
-    tags: tags || [],
-    craftType,
-    region,
-  });
-
-  const createdProduct = await product.save();
-  res.status(201).json(createdProduct);
-});
 
 // @desc    Update a product
 // @route   PUT /api/products/:id
@@ -253,3 +136,145 @@ export const getSellerProducts = asyncHandler(async (req, res) => {
     count,
   });
 });
+
+// Helper function to process image and video files
+const processFiles = (files, type) => {
+  const folder = type === 'images' ? 'uploads/images' : 'uploads/videos';
+  return files.map(file => `/${folder}/${file.filename}`);
+};
+
+// @desc    Fetch all products
+// @route   GET /api/products
+// @access  Public
+export const getProducts = asyncHandler(async (req, res) => {
+  const pageSize = 9;
+  const page = Number(req.query.pageNumber) || 1;
+
+  const keyword = req.query.keyword
+    ? {
+        $or: [
+          { name: { $regex: req.query.keyword, $options: 'i' } },
+          { description: { $regex: req.query.keyword, $options: 'i' } },
+          { tags: { $regex: req.query.keyword, $options: 'i' } },
+        ],
+      }
+    : {};
+
+  const category = req.query.category ? { category: req.query.category } : {};
+  const priceMin = req.query.priceMin ? { price: { $gte: Number(req.query.priceMin) } } : {};
+  const priceMax = req.query.priceMax ? { price: { $lte: Number(req.query.priceMax) } } : {};
+  const rating = req.query.rating ? { rating: { $gte: Number(req.query.rating) } } : {};
+  const craftType = req.query.craftType ? { craftType: req.query.craftType } : {};
+  const region = req.query.region ? { region: req.query.region } : {};
+
+  // Combine all filters
+  const filters = {
+    ...keyword,
+    ...category,
+    ...priceMin,
+    ...priceMax,
+    ...rating,
+    ...craftType,
+    ...region,
+    isActive: true,
+  };
+
+  const count = await Product.countDocuments(filters);
+  const products = await Product.find(filters)
+    .populate('category', 'name')
+    .populate('seller', 'name')
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+    .sort(req.query.sortBy ? { [req.query.sortBy]: req.query.order === 'desc' ? -1 : 1 } : { createdAt: -1 });
+
+  res.json({
+    products,
+    page,
+    pages: Math.ceil(count / pageSize),
+    count,
+  });
+});
+
+// @desc    Fetch single product
+// @route   GET /api/products/:id
+// @access  Public
+export const getProductById = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id).populate('category', 'name').populate('seller', 'name');
+
+  if (product && product.isActive) {
+    res.json(product);
+  } else {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+});
+
+// @desc    Create a product
+// @route   POST /api/products
+// @access  Private/Seller
+export const createProduct = asyncHandler(async (req, res) => {
+  const {
+    name,
+    description,
+    price,
+    category,
+    countInStock,
+    materials,
+    dimensions,
+    weight,
+    tags,
+    craftType,
+    region,
+  } = req.body;
+
+  const dimensionsParsed = JSON.parse(dimensions);
+  const weightParsed = JSON.parse(weight);
+
+  const images = processFiles(req.files.images || [], 'images');
+  const videos = processFiles(req.files.videos || [], 'videos');
+
+  const product = new Product({
+    seller: req.seller._id,
+    name,
+    description,
+    price,
+    images,
+    videos, // Adding videos
+    category,
+    countInStock,
+    materials: materials || [],
+    dimensions: dimensionsParsed || {},
+    weight: weightParsed || {},
+    tags: tags || [],
+    craftType,
+    region,
+    isApproved: false, // Newly added approval field
+  });
+
+  const createdProduct = await product.save();
+  res.status(201).json(createdProduct);
+});
+
+// @desc    Approve or reject a product (Admin only)
+// @route   PUT /api/products/:id/approve
+// @access  Private/Admin
+export const approveProduct = asyncHandler(async (req, res) => {
+  const { approved } = req.body;
+
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  product.isApproved = approved;
+  await product.save();
+
+  res.status(200).json({
+    message: approved ? 'Product approved successfully' : 'Product approval rejected',
+    product,
+  });
+});
+
+
