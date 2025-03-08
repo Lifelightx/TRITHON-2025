@@ -18,8 +18,7 @@ router.route('/profile')
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
 router.route('/address')
-  .post(protect, addUserAddress);
-router.route('/address/:id')
+  .post(protect, addUserAddress)
   .put(protect, updateUserAddress)
   .delete(protect, deleteUserAddress);
 
