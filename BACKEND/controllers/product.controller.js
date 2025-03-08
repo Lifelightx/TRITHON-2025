@@ -49,7 +49,7 @@ export const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find(filters)
     .populate('category', 'name')
     .populate('seller', 'name')
-    .limit(pageSize)
+    // .limit(pageSize)
     .skip(pageSize * (page - 1))
     .sort(req.query.sortBy ? { [req.query.sortBy]: req.query.order === 'desc' ? -1 : 1 } : { createdAt: -1 });
 
