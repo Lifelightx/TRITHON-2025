@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, User, Lock, ShoppingBag } from 'lucide-react';
 import {useNavigate} from "react-router-dom";
-
+import axios from 'axios'
+import { useContext } from 'react';
+import { StoreContext } from '../Context';
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const {url, setToken} = useContext(StoreContext)
 const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would handle the login logic
+    axios.post(`${url}/api/admin/login`, {username:username , password: password})
+    .then(res => {
+      setToken()
+    })
     console.log('Login attempt with:', username);
   };
 

@@ -17,7 +17,7 @@ const Navbar = () => {
     { name: 'Product Moderation', icon: <ShoppingBag className="w-5 h-5" />, path: '/admin/products' },
     { name: 'Manage Categories', icon: <Tag className="w-5 h-5" />, path: '/admin/categories' },
     { name: 'Review Complaints', icon: <MessageSquare className="w-5 h-5" />, path: '/admin/complaints' },
-    { name: 'Analytics Dashboard', icon: <BarChart2 className="w-5 h-5" />, path: '/admin/analytics'
+    { name: 'Analytics Dashboard', icon: <BarChart2 className="w-5 h-5" />, path: '/admin/analytics'}
   ];
   
   return (

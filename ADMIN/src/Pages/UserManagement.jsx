@@ -13,7 +13,8 @@ import {
   X
 } from 'lucide-react';
 import axios from 'axios';
-
+import { useContext } from 'react';
+import { StoreContext } from '../Context';
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,15 +23,19 @@ const UserManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
-
+  
   useEffect(() => {
     fetchUsers(currentPage);
   }, [currentPage]);
-
+  const {url, token} = useContext(StoreContext)
   const fetchUsers = async (pageNumber) => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`/api/users?pageNumber=${pageNumber}`);
+      const { data } = await axios.get(`${url}/api/admin/users?pageNumber=${pageNumber}`,{
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      });
       setUsers(data.users);
       setTotalPages(data.pages);
       setLoading(false);

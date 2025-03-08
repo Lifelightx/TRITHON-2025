@@ -10,7 +10,8 @@ import {
   TextSelection, 
   Ruler, 
   Box, 
-  Globe 
+  Globe,
+  Video
 } from 'lucide-react';
 import { StoreContext } from '../Context';
 const AddProductForm = () => {
@@ -19,6 +20,7 @@ const AddProductForm = () => {
     description: '',
     price: '',
     images: [],
+    video: '',
     category: '', 
     countInStock: '',
     materials: [],
@@ -43,6 +45,7 @@ const AddProductForm = () => {
   const [newTag, setNewTag] = useState('');
   const [newMaterial, setNewMaterial] = useState('');
   const [imageFiles, setImageFiles] = useState([]);
+  const [videoFile, setVideoFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -65,6 +68,25 @@ const AddProductForm = () => {
         [name]: type === 'checkbox' ? checked : value
       }));
     }
+  };
+
+  const handleVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setVideoFile(file);
+      setProductData(prev => ({
+        ...prev,
+        video: URL.createObjectURL(file)
+      }));
+    }
+  };
+
+  const removeVideo = () => {
+    setVideoFile(null);
+    setProductData(prev => ({
+      ...prev,
+      video: ''
+    }));
   };
 
   const handleImageUpload = (e) => {
@@ -176,6 +198,11 @@ const AddProductForm = () => {
         formData.append('images', file);
       });
 
+      // Append video file if exists
+      if (videoFile) {
+        formData.append('video', videoFile);
+      }
+
       // Send to backend
       
       const response = await axios.post(`${url}/api/products`, formData, {
@@ -196,6 +223,7 @@ const AddProductForm = () => {
         description: '',
         price: '',
         images: [],
+        video: '',
         category: '',
         countInStock: '',
         materials: [],
@@ -216,6 +244,7 @@ const AddProductForm = () => {
         isActive: true
       });
       setImageFiles([]);
+      setVideoFile(null);
       setNewTag('');
       setNewMaterial('');
 
@@ -297,6 +326,7 @@ const AddProductForm = () => {
         </div>
 
         {/* Images Upload */}
+        <div className='flex space-x-4'>
         <div className="form-group">
           <label className="flex items-center mb-2 text-gray-700">
             <Upload className="mr-2 text-indigo-500" />
@@ -336,6 +366,46 @@ const AddProductForm = () => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Video Upload */}
+        <div className="form-group">
+          <label className="flex items-center mb-2 text-gray-700">
+            <Video className="mr-2 text-indigo-500" />
+            Product Video
+          </label>
+          <div className="flex items-center">
+            <input
+              type="file"
+              accept="video/*"
+              onChange={handleVideoUpload}
+              className="hidden"
+              id="video-upload"
+            />
+            <label 
+              htmlFor="video-upload" 
+              className="flex items-center px-4 py-2 bg-indigo-500 text-white rounded-md cursor-pointer hover:bg-indigo-600"
+            >
+              <PlusCircle className="mr-2" /> Upload Video
+            </label>
+          </div>
+          {productData.video && (
+            <div className="mt-4 relative">
+              <video 
+                src={productData.video} 
+                controls 
+                className="w-full max-w-md rounded-md"
+              />
+              <button
+                type="button"
+                onClick={removeVideo}
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          )}
+        </div>
         </div>
 
         {/* Advanced Details */}
