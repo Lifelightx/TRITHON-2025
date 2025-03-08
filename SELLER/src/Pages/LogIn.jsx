@@ -149,6 +149,7 @@ const Login = () => {
                 whileTap={{ scale: 0.95 }}
                 type="submit"
                 className="w-full bg-[#8B4613] text-white py-3 rounded-lg font-bold hover:bg-[#6B3E23] transition-colors flex items-center justify-center"
+                onClick={() => {navigate("/seller/profile")}}
               >
                 Login
                 <ArrowRight className="ml-2" size={20} />

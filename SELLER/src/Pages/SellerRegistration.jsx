@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, Phone, Briefcase, MapPin, CheckCircle } from 'lucide-react';
+import { Mail, Lock, User, Phone, Briefcase, MapPin, CheckCircle,IdCard  } from 'lucide-react';
 import { motion } from 'framer-motion';
 import craftMan from '../assets/craftman.jpg'
+import {useNavigate} from "react-router-dom";
 const SellerRegistration = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -23,6 +24,7 @@ const SellerRegistration = () => {
     console.log(formData);
     setFormSubmitted(true);
   };
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -42,9 +44,11 @@ const SellerRegistration = () => {
                 { icon: User, name: 'name', placeholder: 'Full Name', type: 'text' },
                 { icon: Mail, name: 'email', placeholder: 'Email', type: 'email' },
                 { icon: Lock, name: 'password', placeholder: 'Password', type: 'password' },
+                {icon : IdCard,name: "aadhaar",placeholder: "Aadhaar No",type:"number"},
                 { icon: Phone, name: 'phone', placeholder: 'Phone Number', type: 'tel' },
                 { icon: Briefcase, name: 'businessName', placeholder: 'Business Name', type: 'text' },
                 { icon: MapPin, name: 'businessAddress', placeholder: 'Business Address', type: 'text' }
+
               ].map(({ icon: Icon, name, placeholder, type }) => (
                 <div key={name} className="relative">
                   <div className="flex items-center border-2 border-gray-300 rounded-lg px-4 py-3 focus-within:border-orange-500 transition-colors">
@@ -67,6 +71,7 @@ const SellerRegistration = () => {
                 whileTap={{ scale: 0.95 }}
                 type="submit"
                 className="w-full bg-orange-600 cursor-pointer text-white py-3 rounded-lg font-bold hover:bg-orange-700 transition-colors"
+                onClick={() => {navigate("/seller/login")}}
               >
                 Register Now
               </motion.button>
