@@ -13,14 +13,14 @@ const generateToken = (id) => {
 // @route   POST /api/sellers/register
 // @access  Public
 export const registerSeller = asyncHandler(async (req, res) => {
-  const { name, email, password, phone, businessName, businessAddress } = req.body;
+  const { name, email, password, phone, businessName, businessAddress, aadhaarNumber } = req.body;
 
-  // Check if seller exists
-  const sellerExists = await Seller.findOne({ email });
+  // Check if seller exists by email or Aadhaar number
+  const sellerExists = await Seller.findOne({ $or: [{ email }, { aadhaarNumber }] });
 
   if (sellerExists) {
     res.status(400);
-    throw new Error('Seller already exists');
+    throw new Error('Seller with this email or Aadhaar number already exists');
   }
 
   // Create seller
@@ -31,6 +31,7 @@ export const registerSeller = asyncHandler(async (req, res) => {
     phone,
     businessName,
     businessAddress,
+    aadhaarNumber,
     role: 'seller', // Set role to 'seller'
     isApproved: false, // Sellers need approval
   });
@@ -43,6 +44,7 @@ export const registerSeller = asyncHandler(async (req, res) => {
       phone: seller.phone,
       businessName: seller.businessName,
       businessAddress: seller.businessAddress,
+      aadhaarNumber: seller.aadhaarNumber,
       role: seller.role,
       isApproved: seller.isApproved,
       token: generateToken(seller._id),
@@ -72,7 +74,6 @@ export const loginSeller = asyncHandler(async (req, res) => {
       res.status(401);
       throw new Error('Seller account is pending approval');
     }
-    
 
     res.json({
       _id: seller._id,
@@ -81,6 +82,7 @@ export const loginSeller = asyncHandler(async (req, res) => {
       phone: seller.phone,
       businessName: seller.businessName,
       businessAddress: seller.businessAddress,
+      aadhaarNumber: seller.aadhaarNumber,
       role: seller.role,
       isApproved: seller.isApproved,
       token: generateToken(seller._id),
@@ -105,6 +107,7 @@ export const getSellerProfile = asyncHandler(async (req, res) => {
       phone: seller.phone,
       businessName: seller.businessName,
       businessAddress: seller.businessAddress,
+      aadhaarNumber: seller.aadhaarNumber,
       role: seller.role,
       profileImage: seller.profileImage,
     });
@@ -126,8 +129,9 @@ export const updateSellerProfile = asyncHandler(async (req, res) => {
     seller.phone = req.body.phone || seller.phone;
     seller.businessName = req.body.businessName || seller.businessName;
     seller.businessAddress = req.body.businessAddress || seller.businessAddress;
+    seller.aadhaarNumber = req.body.aadhaarNumber || seller.aadhaarNumber;
     seller.profileImage = req.body.profileImage || seller.profileImage;
-    
+
     if (req.body.password) {
       seller.password = req.body.password;
     }
@@ -141,6 +145,7 @@ export const updateSellerProfile = asyncHandler(async (req, res) => {
       phone: updatedSeller.phone,
       businessName: updatedSeller.businessName,
       businessAddress: updatedSeller.businessAddress,
+      aadhaarNumber: updatedSeller.aadhaarNumber,
       role: updatedSeller.role,
       profileImage: updatedSeller.profileImage,
       token: generateToken(updatedSeller._id),
@@ -156,13 +161,13 @@ export const updateSellerProfile = asyncHandler(async (req, res) => {
 // @access  Private
 export const addSellerAddress = asyncHandler(async (req, res) => {
   const { street, city, state, postalCode, country, isDefault } = req.body;
-  
+
   const seller = await Seller.findById(req.seller._id);
 
   if (seller) {
     // If this address is set as default, unset any existing default
     if (isDefault) {
-      seller.businessAddress.forEach(address => {
+      seller.businessAddress.forEach((address) => {
         address.isDefault = false;
       });
     }
@@ -178,7 +183,7 @@ export const addSellerAddress = asyncHandler(async (req, res) => {
     });
 
     await seller.save();
-    
+
     res.status(201).json(seller.businessAddress);
   } else {
     res.status(404);
@@ -191,12 +196,12 @@ export const addSellerAddress = asyncHandler(async (req, res) => {
 // @access  Private
 export const updateSellerAddress = asyncHandler(async (req, res) => {
   const { street, city, state, postalCode, country, isDefault } = req.body;
-  
+
   const seller = await Seller.findById(req.seller._id);
 
   if (seller) {
     const addressIndex = seller.businessAddress.findIndex(
-      address => address._id.toString() === req.params.id
+      (address) => address._id.toString() === req.params.id
     );
 
     if (addressIndex === -1) {
@@ -206,7 +211,7 @@ export const updateSellerAddress = asyncHandler(async (req, res) => {
 
     // If this address is set as default, unset any existing default
     if (isDefault) {
-      seller.businessAddress.forEach(address => {
+      seller.businessAddress.forEach((address) => {
         address.isDefault = false;
       });
     }
@@ -223,7 +228,7 @@ export const updateSellerAddress = asyncHandler(async (req, res) => {
     };
 
     await seller.save();
-    
+
     res.json(seller.businessAddress);
   } else {
     res.status(404);
@@ -239,7 +244,7 @@ export const deleteSellerAddress = asyncHandler(async (req, res) => {
 
   if (seller) {
     const addressIndex = seller.businessAddress.findIndex(
-      address => address._id.toString() === req.params.id
+      (address) => address._id.toString() === req.params.id
     );
 
     if (addressIndex === -1) {
@@ -251,7 +256,7 @@ export const deleteSellerAddress = asyncHandler(async (req, res) => {
     seller.businessAddress.splice(addressIndex, 1);
 
     await seller.save();
-    
+
     res.json({ message: 'Address removed' });
   } else {
     res.status(404);

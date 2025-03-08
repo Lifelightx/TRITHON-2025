@@ -26,6 +26,15 @@ const sellerSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add a phone number'],
     },
+    aadhaarNumber: {
+      type: String,
+      required: [true, 'Please add an Aadhaar number'],
+      unique: true,
+      match: [
+        /^\d{12}$/, // Aadhaar numbers are 12-digit numeric values
+        'Please add a valid Aadhaar number',
+      ],
+    },
     businessName: {
       type: String,
       required: [true, 'Please add a business name'],
@@ -45,9 +54,9 @@ const sellerSchema = mongoose.Schema(
       type: String,
       default: '',
     },
-    role:{
+    role: {
       type: String,
-      default: 'seller',  // Role of seller is set to seller by default.
+      default: 'seller', // Role of seller is set to seller by default.
     },
     isActive: {
       type: Boolean,
