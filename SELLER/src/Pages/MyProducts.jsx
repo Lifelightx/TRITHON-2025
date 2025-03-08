@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -38,6 +39,7 @@ const MyProducts = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
+
       const { data } = await axios.get(`${url}/api/products/seller?pageNumber=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -347,3 +349,4 @@ const MyProducts = () => {
 };
 
 export default MyProducts;
+

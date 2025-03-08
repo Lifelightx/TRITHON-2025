@@ -101,7 +101,7 @@ const SellerRegistration = () => {
         </div>
       </div>
     </div>
-  );
+  );c
 };
 
 export default SellerRegistration;

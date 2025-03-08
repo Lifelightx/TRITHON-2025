@@ -2,8 +2,8 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Mail, Lock, ArrowRight, Palette } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { StoreContext } from '../Context';
 import { useNavigate } from 'react-router-dom';
+import { StoreContext } from '../context';
 
 const Login = () => {
   const [formData, setFormData] = useState({

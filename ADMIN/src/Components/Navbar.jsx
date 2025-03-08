@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+
+
 import { Menu, X, Users, Store, ShoppingBag, FileText, BarChart2, Tag, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -15,7 +17,7 @@ const Navbar = () => {
     { name: 'Product Moderation', icon: <ShoppingBag className="w-5 h-5" />, path: '/admin/products' },
     { name: 'Manage Categories', icon: <Tag className="w-5 h-5" />, path: '/admin/categories' },
     { name: 'Review Complaints', icon: <MessageSquare className="w-5 h-5" />, path: '/admin/complaints' },
-    { name: 'Analytics Dashboard', icon: <BarChart2 className="w-5 h-5" />, path: '/admin/analytics' },
+    { name: 'Analytics Dashboard', icon: <BarChart2 className="w-5 h-5" />, path: '/admin/analytics'
   ];
   
   return (
@@ -24,6 +26,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
+
             <div className="flex-shrink-0 font-bold text-xl">
               <Link to="/admin" className="flex items-center">
                 Admin Panel
@@ -33,6 +36,7 @@ const Navbar = () => {
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-4">
               {navItems.map((item) => (
+
                 <Link
                   key={item.name}
                   to={item.path}
@@ -54,12 +58,15 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+
       
       {/* Mobile menu, show/hide based on menu state */}
+
       {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navItems.map((item) => (
+
               <Link
                 key={item.name}
                 to={item.path}
@@ -69,6 +76,7 @@ const Navbar = () => {
                 {item.icon}
                 <span className="ml-2">{item.name}</span>
               </Link>
+
             ))}
           </div>
         </div>
