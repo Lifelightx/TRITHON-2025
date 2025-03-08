@@ -4,7 +4,13 @@ import path from 'path';
 // Set storage engine
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/images/'); // Path to the upload/images folder
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, 'uploads/images/'); // Path to the images folder
+    } else if (file.mimetype.startsWith('video/')) {
+      cb(null, 'uploads/videos/'); // Path to the videos folder
+    } else {
+      cb('Error: Invalid file type!');
+    }
   },
   filename: (req, file, cb) => {
     cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
@@ -13,14 +19,19 @@ const storage = multer.diskStorage({
 
 // Check file type
 const checkFileType = (file, cb) => {
-  const filetypes = /jpeg|jpg|png/;
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
+  const allowedImageTypes = /jpeg|jpg|png/;
+  const allowedVideoTypes = /mp4|mov|avi|mkv/;
+
+  const extname = allowedImageTypes.test(path.extname(file.originalname).toLowerCase()) ||
+    allowedVideoTypes.test(path.extname(file.originalname).toLowerCase());
+
+  const mimetype = allowedImageTypes.test(file.mimetype) ||
+    allowedVideoTypes.test(file.mimetype);
 
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    cb('Error: Images Only!');
+    cb('Error: Only images and videos are allowed!');
   }
 };
 
@@ -29,6 +40,9 @@ const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
     checkFileType(file, cb);
+  },
+  limits: {
+    fileSize: 100 * 1024 * 1024, // Limit file size to 100MB
   }
 });
 
