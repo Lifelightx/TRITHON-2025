@@ -5,7 +5,8 @@ import Navbar from './Components/Navbar'
 import Home from './Pages/Home'
 import Footer from './Components/Footer'
 import { StoreContext } from './Context'
-import ManageSellers from './Components/ManageSeller'
+import UserManagement from './Pages/UserManagement'
+
 function App() {
   const {token} = useContext(StoreContext)
   return (
@@ -16,8 +17,10 @@ function App() {
           <>
             <Navbar />
             <Routes>
-            <Route path='/home' element={token &&<Home />} />
-            <Route path='/home/manageSeller' element={<ManageSellers/>} />
+
+              <Route path='/home' element={token &&<Home />} />
+              <Route path='/admin/users' element={<UserManagement/>}/>
+
             </Routes>
             <Footer/>
           </>
