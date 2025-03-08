@@ -12,11 +12,15 @@ const Login = () => {
 const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post(`${url}/api/admin/login`, {username:username , password: password})
+    
+    axios.post(`${url}/api/admin/login`, {email:username , password: password})
     .then(res => {
-      setToken()
+      setToken(res.data.token)
+      console.log(res.data)
+      localStorage.setItem("adminToken", res.data.token)
+      navigate('/home')
     })
-    console.log('Login attempt with:', username);
+    
   };
 
   return (
