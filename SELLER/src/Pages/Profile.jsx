@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
@@ -18,6 +19,7 @@ import { StoreContext } from '../Context';
 
 const Profile = () => {
   const [seller, setSeller] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const {url,token} = useContext(StoreContext)
@@ -39,6 +41,7 @@ const Profile = () => {
         setLoading(false);
       }
     };
+
 
     fetchProfile();
   }, []);
@@ -196,6 +199,7 @@ const Profile = () => {
           </motion.div>
         </div>
       </motion.div>
+
     </div>
   );
 };

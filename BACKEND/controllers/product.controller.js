@@ -242,7 +242,7 @@ export const getSellerProducts = asyncHandler(async (req, res) => {
   const count = await Product.countDocuments({ seller: req.seller._id });
   const products = await Product.find({ seller: req.seller._id })
     .populate('category', 'name')
-    .limit(pageSize)
+    // .limit(pageSize)
     .skip(pageSize * (page - 1))
     .sort({ createdAt: -1 });
 

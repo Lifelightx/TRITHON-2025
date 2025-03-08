@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -38,6 +39,7 @@ const MyProducts = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
+
       const { data } = await axios.get(`${url}/api/products/seller?pageNumber=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -101,7 +103,7 @@ const MyProducts = () => {
             <div className="relative h-48 bg-gray-100">
               {product.images && product.images.length > 0 ? (
                 <img 
-                  src={product.images[0]} 
+                  src={`${url}${product.images}`} 
                   alt={product.name} 
                   className="w-full h-full object-cover"
                 />
@@ -183,7 +185,7 @@ const MyProducts = () => {
                       {product.images && product.images.length > 0 ? (
                         <img
                           className="h-10 w-10 rounded-md object-cover"
-                          src={product.images[0]}
+                          src={`${url}${product.images[0]}`}
                           alt={product.name}
                         />
                       ) : (
@@ -203,7 +205,7 @@ const MyProducts = () => {
                   <div className="flex justify-end space-x-2">
                     <button
                       onClick={() => handleEditProduct(product._id)}
-                      className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+                      className="p-1 text-orange-400 hover:text-orange-800 transition-colors"
                       aria-label="Edit product"
                     >
                       <Edit size={18} />
@@ -304,7 +306,7 @@ const MyProducts = () => {
                     onClick={() => setCurrentPage(pageNum)}
                     className={`w-10 h-10 rounded-md ${
                       currentPage === pageNum
-                        ? 'bg-indigo-600 text-white'
+                        ? 'bg-orange-600 text-white'
                         : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
                     }`}
                   >
@@ -347,3 +349,4 @@ const MyProducts = () => {
 };
 
 export default MyProducts;
+
