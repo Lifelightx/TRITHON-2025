@@ -92,7 +92,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     craftType,
     region,
   } = req.body;
-
+  console.log(req.body)
   // Verify category exists
   // const categoryExists = await Category.findById(category);
   // if (!categoryExists) {

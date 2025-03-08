@@ -9,11 +9,9 @@ export const StoreContextProvider = ({children})=>{
     const [token, setToken] = useState("")
     const [user, setUser] = useState({})
     useEffect(()=>{
-        const storedToken = localStorage.getItem("token")
-        const storedUser = JSON.parse(localStorage.getItem("user"))
+        const storedToken = localStorage.getItem("adminToken")
         if(storedToken){
             setToken(storedToken)
-            setUser(storedUser)
         }
     },[token])
     const contextVal = {

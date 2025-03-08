@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   User,
   LogIn,
@@ -69,8 +69,9 @@ function Navbar() {
       axios.post(`${url}/api/auth/login`,values)
       .then(res=> {
         setToken(res.data.token)
- 
+        console.log(res.data)
         localStorage.setItem("token",res.data.token)
+        localStorage.setItem("user", JSON.stringify(res.data))
         setUser(res.data)
       })
       .catch(err =>console.log(err))
@@ -141,12 +142,12 @@ function Navbar() {
           <ul className="hidden md:flex space-x-8">
             {navItems.map((item, index) => (
               <li key={index}>
-                <a
+                <Link
                   className="text-gray-700 hover:text-[#bf4221] font-medium transition-colors duration-200"
-                  href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                  to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
                 >
                   {item}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

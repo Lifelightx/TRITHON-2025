@@ -11,14 +11,23 @@ import {
   X
 } from "lucide-react";
 import { format } from "date-fns";
+import axios from "axios";
 
 function Profile() {
-  const { user } = useContext(StoreContext);
+  const { user,url,token } = useContext(StoreContext);
+  console.log(user)
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(null);
-  const [newAddress, setNewAddress] = useState("");
   const [showAddressModal, setShowAddressModal] = useState(false);
-
+  const [newAddress, setNewAddress] = useState({
+    street: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "",
+    isDefault: false
+  });
+  const [address, setAddress] = useState([])
   // Initialize the edited user data when entering edit mode
   const handleEditToggle = () => {
     if (!isEditing) {
@@ -40,10 +49,19 @@ function Profile() {
     });
   };
 
+  // Handle address form input changes
+  const handleAddressInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNewAddress({
+      ...newAddress,
+      [name]: type === 'checkbox' ? checked : value,
+    });
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    axios.post(`${url}/api/`)
     // Here you would make an API call to update the user profile
     // For example: await axios.put(`${url}/api/users`, editedUser, { headers: { Authorization: `Bearer ${token}` } });
     
@@ -67,13 +85,41 @@ function Profile() {
 
   // Handle adding a new address
   const handleAddAddress = () => {
-    if (newAddress.trim()) {
+    // Validate required fields
+    if (newAddress.street.trim() && newAddress.city.trim()) {
       // Here you would make an API call to add the address
-      // For example: await axios.post(`${url}/api/users/address`, { address: newAddress }, { headers: { Authorization: `Bearer ${token}` } });
-      
-      setNewAddress("");
+      // For example: await axios.post(`${url}/api/users/address`, newAddress, { headers: { Authorization: `Bearer ${token}` } });
+      axios.post(`${url}/api/auth/address`, newAddress, {
+        headers:{
+            Authorization:`Bearer ${token}`
+        }
+      } )
+      .then(res=> console.log(res.data))
+      .catch(err=> console.log(err))
+      // Reset form and close modal
+      setNewAddress({
+        street: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "",
+        isDefault: false
+      });
       setShowAddressModal(false);
     }
+  };
+
+  // Format address for display
+  const formatAddress = (address) => {
+    const parts = [
+      address.street,
+      address.city,
+      address.state,
+      address.postalCode,
+      address.country
+    ].filter(Boolean);
+    
+    return parts.join(', ');
   };
 
   if (!user) {
@@ -276,7 +322,14 @@ function Profile() {
                     {user.addresses.map((address, index) => (
                       <div key={index} className="bg-gray-50 p-3 rounded border border-gray-200 flex">
                         <MapPin className="text-[#bf4221] mr-2 flex-shrink-0 mt-0.5" size={18} />
-                        <p className="text-gray-700">{address}</p>
+                        <div>
+                          <p className="text-gray-700">{formatAddress(address)}</p>
+                          {address.isDefault && (
+                            <span className="text-xs bg-[#bf4221] text-white px-2 py-0.5 rounded-full mt-1 inline-block">
+                              Default
+                            </span>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -313,26 +366,90 @@ function Profile() {
             </div>
             
             <div className="p-4">
-              <textarea
-                value={newAddress}
-                onChange={(e) => setNewAddress(e.target.value)}
-                placeholder="Enter your full address"
-                className="w-full p-3 border border-gray-300 rounded resize-none h-32 focus:ring-[#bf4221] focus:border-[#bf4221]"
-              ></textarea>
-              
-              <div className="flex justify-end mt-4 space-x-3">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Street Address*</label>
+                  <input
+                    type="text"
+                    name="street"
+                    value={newAddress.street}
+                    onChange={handleAddressInputChange}
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-[#bf4221] focus:border-[#bf4221]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">City*</label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={newAddress.city}
+                    onChange={handleAddressInputChange}
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-[#bf4221] focus:border-[#bf4221]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">State/Province</label>
+                  <input
+                    type="text"
+                    name="state"
+                    value={newAddress.state}
+                    onChange={handleAddressInputChange}
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-[#bf4221] focus:border-[#bf4221]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                  <input
+                    type="text"
+                    name="postalCode"
+                    value={newAddress.postalCode}
+                    onChange={handleAddressInputChange}
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-[#bf4221] focus:border-[#bf4221]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                  <input
+                    type="text"
+                    name="country"
+                    value={newAddress.country}
+                    onChange={handleAddressInputChange}
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-[#bf4221] focus:border-[#bf4221]"
+                  />
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="isDefault"
+                    checked={newAddress.isDefault}
+                    onChange={handleAddressInputChange}
+                    className="h-4 w-4 text-[#bf4221] focus:ring-[#bf4221] border-gray-300 rounded"
+                  />
+                  <label className="ml-2 text-sm text-gray-700">Set as default address</label>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end space-x-3">
                 <button
+                  type="button"
                   onClick={() => setShowAddressModal(false)}
-                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-100"
+                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={handleAddAddress}
                   className="px-4 py-2 bg-[#bf4221] text-white rounded hover:bg-[#a3361a]"
-                  disabled={!newAddress.trim()}
                 >
-                  Save Address
+                  Add Address
                 </button>
               </div>
             </div>
