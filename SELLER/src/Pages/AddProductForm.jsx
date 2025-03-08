@@ -20,7 +20,7 @@ const AddProductForm = () => {
     description: '',
     price: '',
     images: [],
-    video: '',
+    videos: [],
     category: '', 
     countInStock: '',
     materials: [],
@@ -200,14 +200,14 @@ const AddProductForm = () => {
 
       // Append video file if exists
       if (videoFile) {
-        formData.append('video', videoFile);
+        formData.append('videos', videoFile);
       }
 
       // Send to backend
       
       const response = await axios.post(`${url}/api/products`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          // 'Content-Type': 'multipart/form-data',
           // Include Authorization header if using JWT
            'Authorization': `Bearer ${token}`
         }
@@ -223,7 +223,7 @@ const AddProductForm = () => {
         description: '',
         price: '',
         images: [],
-        video: '',
+        videos: '',
         category: '',
         countInStock: '',
         materials: [],
@@ -251,6 +251,7 @@ const AddProductForm = () => {
     } catch (err) {
       console.error('Error creating product:', err.response?.data || err.message);
       setError(err.response?.data?.message || 'Failed to create product');
+      console.log(err)
     } finally {
       setLoading(false);
     }
