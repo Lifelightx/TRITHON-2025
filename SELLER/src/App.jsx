@@ -7,17 +7,22 @@ import SellerRegistration from './Pages/SellerRegistration'
 import Login from './Pages/LogIn'
 import AddProductForm from './Pages/AddProductForm'
 import Profile from './Pages/Profile'
+import MyProducts from './Pages/MyProducts'
+import { ToastContainer, toast } from 'react-toastify';
+  
 function App() {
   
   return (
     <BrowserRouter>
     <Navbar/>
+    <ToastContainer />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path='/seller/register' element={<SellerRegistration />} />
         <Route path='/seller/profile' element={<Profile/>} />
         <Route path='/seller/login' element={<Login />} />
+        <Route path='/seller/products' element={<MyProducts/>}/>
         <Route path='/seller/dashboard' element={<AddProductForm/>} />
       </Routes>
     <Footer/>
