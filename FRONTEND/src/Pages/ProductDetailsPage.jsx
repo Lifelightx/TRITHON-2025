@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, ShoppingCart, ArrowLeft, Star, Clock, Info, Globe, Tag, Scale, Ruler } from 'lucide-react';
+import { Heart, ShoppingCart, ArrowLeft, Star, Clock, IndianRupee, Info, Globe, Tag, Scale, Ruler } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useContext } from 'react';
@@ -20,7 +20,7 @@ const ProductDetailsPage = () => {
   
   const { id } = useParams(); // Get product ID from URL parameters
   const navigate = useNavigate();
-  const {url} = useContext(StoreContext)
+  const {url,token} = useContext(StoreContext)
   // Fetch product data when component mounts
   useEffect(() => {
     const fetchProductData = async () => {
@@ -51,6 +51,15 @@ const ProductDetailsPage = () => {
   const handleAddToCart = () => {
     console.log(`Added ${quantity} of ${product.name} to cart`);
     // This will be replaced with actual cart functionality
+    axios.post(`${url}/api/cart/`, {productId:id, quantity:quantity},
+     {
+      headers:{
+        Authorization:`Bearer ${token}`
+      }
+     }
+    )
+    .then(res => console.log(res.data))
+    .catch(err => console.log(err))
   };
 
   const handleBuyNow = () => {
@@ -142,7 +151,7 @@ const ProductDetailsPage = () => {
             </div>
           </div>
 
-          <div className="text-2xl font-bold text-gray-900">${product.price.toFixed(2)}</div>
+          <div className="text-2xl font-bold text-gray-900 flex items-center"> <IndianRupee/> {product.price.toFixed(2)}</div>
 
           <div className="border-t border-[#a76130] border-b py-4">
             <div className="text-sm font-medium text-gray-500 mb-2">Description</div>
