@@ -11,7 +11,7 @@ const CartPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
-  const { url, token } = useContext(StoreContext);
+  const { url, token, setCartData } = useContext(StoreContext);
 
   useEffect(() => {
     if (token) {
@@ -32,6 +32,8 @@ const CartPage = () => {
           Authorization: `Bearer ${token}`
         }
       });
+      localStorage.setItem("cart", JSON.stringify(response.data))
+      setCartData(response.data)
       setCart(response.data);
       setLoading(false);
     } catch (err) {

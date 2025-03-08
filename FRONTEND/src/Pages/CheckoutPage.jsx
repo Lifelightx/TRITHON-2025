@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { CreditCard, Truck, DollarSign, Check, ChevronRight, AlertCircle } from 'lucide-react';
+import { StoreContext } from '../Context';
+import axios from 'axios';
 
 const CheckoutPage = () => {
+  const { url, cartData } = useContext(StoreContext);
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
-    email: '',
+    email: '', 
     addressLine1: '',
     addressLine2: '',
     city: '',
@@ -13,32 +16,17 @@ const CheckoutPage = () => {
     postalCode: '',
     country: '',
   });
-
+  console.log(cartData)
   const [paymentMethod, setPaymentMethod] = useState('');
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Sample cart data - this would come from your cart context/state
-  const cartItems = [
-    {
-      id: '1',
-      name: 'Handcrafted Ceramic Vase',
-      price: 79.99,
-      quantity: 1,
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: '2',
-      name: 'Traditional Woven Basket',
-      price: 45.50,
-      quantity: 2,
-      image: '/api/placeholder/80/80'
-    }
-  ];
+  // Calculate totals from cart data
+  const subtotal = cartData?.items?.reduce((total, item) => {
+    return total + (item.product.price * item.quantity);
+  }, 0) || 0;
 
-  // Calculate totals
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shipping = 12.99;
+  const shipping = 0; // Free shipping
   const total = subtotal + shipping;
 
   const handleInputChange = (e) => {
@@ -97,7 +85,9 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
-      // If Stripe is selected, you would normally redirect to Stripe here
+      // First save the shipping address
+      const addressResponse = await axios.post(`${url}/api/users/address`, formData);
+
       if (paymentMethod === 'stripe') {
         console.log('Processing Stripe payment...');
         // Simulating Stripe redirect
@@ -106,14 +96,19 @@ const CheckoutPage = () => {
           // window.location.href = '/stripe-payment-url';
         }, 1500);
       } else {
-        // For COD, just submit the order
-        console.log('Processing Cash on Delivery order...');
-        // Simulate API call
-        setTimeout(() => {
-          alert('Order placed successfully! You will pay on delivery.');
-          // Redirect to confirmation page
-          // window.location.href = '/order-confirmation';
-        }, 1500);
+        // For COD, submit the order with the saved address
+        const orderData = {
+          items: cartData.items,
+          shippingAddress: addressResponse.data,
+          paymentMethod: 'cod',
+          totalAmount: total
+        };
+
+        const orderResponse = await axios.post(`${url}/api/orders`, orderData);
+        
+        alert('Order placed successfully! You will pay on delivery.');
+        // Redirect to confirmation page
+        // window.location.href = `/order-confirmation/${orderResponse.data._id}`;
       }
     } catch (error) {
       console.error('Checkout error:', error);
@@ -342,13 +337,13 @@ const CheckoutPage = () => {
 
             {/* Cart Items */}
             <div className="mb-6">
-              {cartItems.map(item => (
-                <div key={item.id} className="flex py-3 border-b border-gray-100">
-                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
+              {cartData?.items?.map(item => (
+                <div key={item.product._id} className="flex py-3 border-b border-gray-100">
+                  <img src={`${url}${item.product.images[0]}`} alt={item.product.name} className="w-16 h-16 object-cover rounded-md" />
                   <div className="ml-4 flex-grow">
-                    <h3 className="text-sm font-medium">{item.name}</h3>
+                    <h3 className="text-sm font-medium">{item.product.name}</h3>
                     <p className="text-gray-500 text-xs mt-1">Quantity: {item.quantity}</p>
-                    <p className="text-sm font-medium mt-1">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-sm font-medium mt-1">₹{(item.product.price * item.quantity).toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -358,15 +353,15 @@ const CheckoutPage = () => {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Shipping</span>
-                <span>${shipping.toFixed(2)}</span>
+                <span>Free</span>
               </div>
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₹{total.toFixed(2)}</span>
               </div>
             </div>
           </div>
