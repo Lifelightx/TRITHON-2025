@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
-import { Menu, X, Users, Store, ShoppingBag, FileText, BarChart2, Tag, MessageSquare } from 'lucide-react';
+import { Menu, X, Users, Store, ShoppingBag, BarChart2, Tag, MessageSquare } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
+  const handleManageSellerClick = () => {
+    navigate("/home/manageSeller");
+  };
+
   const navItems = [
     { name: 'Manage Users', icon: <Users className="w-5 h-5" /> },
-    { name: 'Manage Sellers', icon: <Store className="w-5 h-5" /> },
+    { name: 'Manage Sellers', icon: <Store className="w-5 h-5" />, onClick: handleManageSellerClick },
     { name: 'Product Moderation', icon: <ShoppingBag className="w-5 h-5" /> },
     { name: 'Manage Categories', icon: <Tag className="w-5 h-5" /> },
     { name: 'Review Complaints', icon: <MessageSquare className="w-5 h-5" /> },
@@ -23,21 +29,19 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <div className="flex-shrink-0 font-bold text-xl">
-              Admin Panel
-            </div>
+            <div className="flex-shrink-0 font-bold text-xl">Admin Panel</div>
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-4">
               {navItems.map((item) => (
-                <a
+                <button
                   key={item.name}
-                  href="#"
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-#-700 flex items-center space-x-1"
+                  onClick={item.onClick}
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 flex items-center space-x-1"
                 >
                   {item.icon}
                   <span>{item.name}</span>
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -52,19 +56,19 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu, show/hide based on menu state */}
+      {/* Mobile menu */}
       {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navItems.map((item) => (
-              <a
+              <button
                 key={item.name}
-                href="#"
-                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 flex items-center space-x-2"
+                onClick={item.onClick}
+                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 flex items-center space-x-2 w-full text-left"
               >
                 {item.icon}
                 <span>{item.name}</span>
-              </a>
+              </button>
             ))}
           </div>
         </div>

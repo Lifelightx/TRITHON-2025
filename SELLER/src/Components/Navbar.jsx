@@ -9,8 +9,9 @@ import {
   Package, 
   ShoppingCart, 
   DollarSign, 
+  BookPlus,
   Layers, 
-  MessageCircle, 
+  User2, 
   LogOut,
   Menu,
   X
@@ -104,19 +105,19 @@ const Navbar = () => {
           <div className="hidden md:flex space-x-4 items-center">
             <motion.div whileHover="hover" whileTap="tap" variants={navItemVariants}>
               <Link to="/seller/dashboard" className="flex items-center text-[#260e02] hover:text-[#dc7600] transition">
-                <LayoutDashboard className="mr-1" /> Dashboard
+                <BookPlus className="mr-1" /> Add Products
               </Link>
             </motion.div>
             
             <motion.div whileHover="hover" whileTap="tap" variants={navItemVariants}>
               <Link to="/seller/products" className="flex items-center text-[#260e02] hover:text-[#dc7600] transition">
-                <Package className="mr-1" /> Products
+                <Package className="mr-1" /> My Products
               </Link>
             </motion.div>
             
             <motion.div whileHover="hover" whileTap="tap" variants={navItemVariants}>
               <Link to="/seller/orders" className="flex items-center text-[#260e02] hover:text-[#dc7600] transition">
-                <ShoppingCart className="mr-1" /> Orders
+                <ShoppingCart className="mr-1" />My Orders
               </Link>
             </motion.div>
             
@@ -133,8 +134,8 @@ const Navbar = () => {
             </motion.div>
             
             <motion.div whileHover="hover" whileTap="tap" variants={navItemVariants}>
-              <Link to="/seller/chat" className="flex items-center text-[#260e02] hover:text-[#dc7600] transition">
-                <MessageCircle className="mr-1" /> Chat
+              <Link to="/seller/profile" className="flex items-center text-[#260e02] hover:text-[#dc7600] transition">
+                <User2 className="mr-1" /> Profile
               </Link>
             </motion.div>
             
