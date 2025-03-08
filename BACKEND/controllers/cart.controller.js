@@ -49,7 +49,7 @@ export const addToCart = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Not enough stock available');
   }
-
+  console.log(req.user._id)
   // Find user's cart or create one
   let cart = await Cart.findOne({ user: req.user._id });
   

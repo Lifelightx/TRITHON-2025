@@ -53,7 +53,7 @@ const Products = () => {
                 alt={product.name} 
                 className="w-full h-48 object-cover"
               />
-              {console.log(product.images[0])}
+              
               <div className="p-4">
                 <h2 className="text-lg font-semibold mb-1">{product.name}</h2>
                 
