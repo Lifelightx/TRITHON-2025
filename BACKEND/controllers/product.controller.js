@@ -13,7 +13,7 @@ const processImages = (files) => {
 // @route   GET /api/products
 // @access  Public
 export const getProducts = asyncHandler(async (req, res) => {
-  const pageSize = 10;
+  const pageSize =9;
   const page = Number(req.query.pageNumber) || 1;
 
   const keyword = req.query.keyword
@@ -49,7 +49,7 @@ export const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find(filters)
     .populate('category', 'name')
     .populate('seller', 'name')
-    // .limit(pageSize)
+    .limit(pageSize)
     .skip(pageSize * (page - 1))
     .sort(req.query.sortBy ? { [req.query.sortBy]: req.query.order === 'desc' ? -1 : 1 } : { createdAt: -1 });
 
@@ -236,13 +236,13 @@ export const getFeaturedProducts = asyncHandler(async (req, res) => {
 // @route   GET /api/products/seller
 // @access  Private/Seller
 export const getSellerProducts = asyncHandler(async (req, res) => {
-  const pageSize = 10;
+  const pageSize = 8;
   const page = Number(req.query.pageNumber) || 1;
 
-  const count = await Product.countDocuments({ seller: req.user._id });
-  const products = await Product.find({ seller: req.user._id })
+  const count = await Product.countDocuments({ seller: req.seller._id });
+  const products = await Product.find({ seller: req.seller._id })
     .populate('category', 'name')
-    // .limit(pageSize)
+    .limit(pageSize)
     .skip(pageSize * (page - 1))
     .sort({ createdAt: -1 });
 
