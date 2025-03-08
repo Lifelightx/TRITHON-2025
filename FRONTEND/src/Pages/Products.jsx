@@ -92,27 +92,41 @@ const Products = () => {
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-center mt-8">
+      <div className="flex items-center justify-center mt-12 space-x-4">
         <button
           onClick={handlePrevious}
           disabled={page === 1}
-          className={`px-4 py-2 rounded-l bg-blue-500 text-white font-semibold hover:bg-blue-600 transition ${
-            page === 1 ? 'opacity-50 cursor-not-allowed' : ''
+          className={`flex items-center px-5 py-2.5 rounded-lg border border-gray-200 bg-white text-orange-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 ${
+            page === 1 ? 'opacity-50 cursor-not-allowed hover:bg-white hover:border-gray-200' : ''
           }`}
         >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
           Previous
         </button>
-        <span className="px-4 py-2 border bg-gray-100 text-gray-800">
-          Page {page} of {totalPages}
-        </span>
+
+        <div className="flex items-center space-x-1 text-sm">
+          <span className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 font-medium">
+            Page {page}
+          </span>
+          <span className="text-gray-500">of</span>
+          <span className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 font-medium">
+            {totalPages}
+          </span>
+        </div>
+
         <button
-          onClick={handleNext}
+          onClick={handleNext} 
           disabled={page === totalPages}
-          className={`px-4 py-2 rounded-r bg-blue-500 text-white font-semibold hover:bg-blue-600 transition ${
-            page === totalPages ? 'opacity-50 cursor-not-allowed' : ''
+          className={`flex items-center px-5 py-2.5 rounded-lg border border-gray-200 bg-white text-orange-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 ${
+            page === totalPages ? 'opacity-50 cursor-not-allowed hover:bg-white hover:border-gray-200' : ''
           }`}
         >
           Next
+          <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
     </div>
