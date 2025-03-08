@@ -1,35 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import axios from "axios";
+import { StoreContext } from "../context"; 
 
 const Profile = () => {
+  const { token, url } = useContext(StoreContext); 
   const [sellers, setSellers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-//   useEffect(() => {
-//     const fetchSellers = async () => {
-//       try {
-//         const response = await fetch("http://localhost:5000/api/sellers/register");
-//         const data = await response.json();
+  useEffect(() => {
+    const fetchSellers = async () => {
+      if (!token) {
+        setError("No authentication token found");
+        setLoading(false);
+        return;
+      }
 
-//         if (!response.ok) {
-//           throw new Error(data.message || "Failed to fetch sellers");
-//         }
+      try {
+        const response = await axios.get(`${url}/api/sellers/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-//         setSellers(data);
-//       } catch (err) {
-//         setError(err.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
+        setSellers(response.data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch sellers");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-//     fetchSellers();
-//   }, []);
+    fetchSellers();
+  }, [token, url]);
 
-//   if (loading) return <p className="text-center text-gray-600">Loading...</p>;
-//   if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (loading) return <p className="text-center text-gray-600">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
+    
     <div className="max-w-6xl mx-auto p-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Seller List</h2>
       <div className="overflow-x-auto">
