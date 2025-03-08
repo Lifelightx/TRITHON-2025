@@ -26,6 +26,14 @@ const productSchema = mongoose.Schema(
         type: String,
         required: true,
       },
+      
+    ],
+    videos: [
+      {
+        type: String,
+        required: true,
+      },
+      
     ],
     category: {
       type: String,
