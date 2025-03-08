@@ -92,14 +92,15 @@ export const createProduct = asyncHandler(async (req, res) => {
     craftType,
     region,
   } = req.body;
-  console.log(req.body)
+  
   // Verify category exists
   // const categoryExists = await Category.findById(category);
   // if (!categoryExists) {
   //   res.status(400);
   //   throw new Error('Invalid category');
   // }
-
+  const dimensionsParsed = JSON.parse(dimensions)
+  const weightParsed = JSON.parse(weight)
   const images = processImages(req.files);
   console.log()
   const product = new Product({
@@ -111,8 +112,8 @@ export const createProduct = asyncHandler(async (req, res) => {
     category,
     countInStock,
     materials: materials || [],
-    dimensions: dimensions || {},
-    weight: weight || {},
+    dimensions: dimensionsParsed || {},
+    weight: weightParsed || {},
     tags: tags || [],
     craftType,
     region,
