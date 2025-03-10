@@ -5,7 +5,7 @@ import { createContext } from "react";
 export const StoreContext = createContext()
 
 export const StoreContextProvider = ({children})=>{
-    const url = "http://localhost:5000"
+    const url = "https://utkal-crafts-backend.onrender.com"
     const [token, setToken] = useState("")
     const [user, setUser] = useState({})
     const [cartData, setCartData] = useState({})

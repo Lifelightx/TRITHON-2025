@@ -5,7 +5,7 @@ import { createContext } from "react";
 export const StoreContext = createContext()
 // ... existing code ...
 export const StoreContextProvider = ({children}) => {
-    const url = "http://localhost:5000";
+    const url = "https://utkal-crafts-backend.onrender.com";
     const [token, setToken] = useState(() => localStorage.getItem("sellerToken") || ""); // Initialize with token from local storage
     const [user, setUser] = useState({});
 
